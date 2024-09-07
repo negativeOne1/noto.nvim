@@ -78,9 +78,7 @@ end
 function M.get_buffer(name)
   local buf_nr = vim.fn.bufnr(name)
   if buf_nr > 0 then
-    print("BUFNR", buf_nr)
     if vim.api.nvim_buf_is_valid(buf_nr) and vim.api.nvim_buf_is_loaded(buf_nr) then
-      print("BUFNR RETURN", buf_nr)
       return buf_nr
     else
       vim.api.nvim_buf_delete(buf_nr, { force = true })
@@ -88,8 +86,9 @@ function M.get_buffer(name)
     end
   end
   if buf_nr < 1 then
-    buf_nr = vim.api.nvim_create_buf(false, true)
+    buf_nr = vim.api.nvim_create_buf(false, false)
     vim.api.nvim_set_option_value("filetype", "todo", { buf = buf_nr })
+    vim.api.nvim_set_option_value("buftype", "", { buf = buf_nr })
   end
   return buf_nr
 end
@@ -99,13 +98,10 @@ function M.create(win)
 
   M.set_keymaps()
 
-  local bufname = string.format("noto [%s]", win)
-  local bufnr = M.get_buffer(bufname)
-
+  local bufnr = M.get_buffer(opts["path"])
   vim.api.nvim_buf_call(bufnr, function()
-    vim.cmd("edit " .. opts["path"])
+    vim.cmd.edit(opts["path"])
   end)
-  vim.api.nvim_buf_set_name(bufnr, bufname)
 
   local width = M.calc_width(opts)
   local height = M.calc_height(opts)
