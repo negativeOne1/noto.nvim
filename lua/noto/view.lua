@@ -165,10 +165,20 @@ function M.open(win)
 end
 
 function M.toggle(win)
-  if M.is_open(win) then
-    M.close(win)
+  t = function(w)
+    if M.is_open(w) then
+      M.close(w)
+    else
+      M.open(w)
+    end
+  end
+
+  if not win then
+    for _, v in ipairs(config.options.windows) do
+      t(v["name"])
+    end
   else
-    M.open(win)
+    t(win)
   end
 end
 
